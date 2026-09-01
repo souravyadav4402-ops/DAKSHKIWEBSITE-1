@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#070a14">
+  <title>MINES STACKER BOT</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <main class="app">
+
+    <!-- Branded header -->
+    <header class="header">
+      <div class="logo-wrap">
+        <img class="logo" src="assets/logo.png"
+             onerror="this.onerror=null;this.src='assets/logo.svg'"
+             alt="Mines Stacker Bot logo">
+      </div>
+      <div class="brand">
+        <h1 class="title">MINES STACKER BOT</h1>
+        <span class="subtitle">Analysis &amp; Visualisation</span>
+      </div>
+    </header>
+
+    <!-- Stage 1: Seed -->
+    <section class="panel">
+      <span class="panel-label"><span class="step-num">1</span>Seed</span>
+      <div class="seed-row">
+        <input id="seedInput" class="seed-input" type="text"
+               placeholder="Enter a seed" autocomplete="off"
+               autocapitalize="characters" spellcheck="false">
+        <button id="generateBtn" class="btn ghost" type="button">Generate</button>
+      </div>
+    </section>
+
+    <!-- Stage 2: Mines selection -->
+    <section class="panel">
+      <div class="mines-head">
+        <span class="panel-label" style="margin:0;"><span class="step-num">2</span>Select Mines</span>
+        <span class="mines-value" id="minesValue">&mdash;</span>
+      </div>
+      <div class="mines-grid" id="minesGrid"></div>
+    </section>
+
+    <!-- Stage 3: Analyze -->
+    <section>
+      <button id="analyzeBtn" class="btn-analyze" type="button" disabled>Analyze</button>
+    </section>
+
+    <!-- Stage 4: Evaluation animation -->
+    <section class="panel stage eval" id="stageEval" hidden>
+      <span class="panel-label"><span class="step-num">4</span>Evaluating</span>
+      <div class="eval-status" id="evalStatus">Initialising...</div>
+      <div class="eval-bar"><div class="eval-fill" id="evalFill"></div></div>
+      <div class="eval-scan"></div>
+    </section>
+
+    <!-- Stage 5: Results grid -->
+    <section class="panel stage" id="stageResults" hidden>
+      <div class="results-head">
+        <span class="panel-label" style="margin:0;"><span class="step-num">5</span>Analysis</span>
+        <div class="results-meta">
+          <span class="mines-label" id="resultsMines">Mines: 0</span>
+          <span class="seed-label" id="resultsSeed">Seed:</span>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="results-actions">
+        <button id="reanalyzeBtn" class="btn" type="button">Re-analyze</button>
+        <button id="resetBtn" class="btn ghost" type="button">Reset</button>
+      </div>
+      <p class="hint">Safe tiles shown as gems. Bomb positions are never revealed.</p>
+    </section>
+
+  </main>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

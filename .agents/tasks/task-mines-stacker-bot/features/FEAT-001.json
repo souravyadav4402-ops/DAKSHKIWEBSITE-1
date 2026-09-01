@@ -1,0 +1,38 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Build the complete self-contained MINES STACKER BOT mobile-only HTML application. Single index.html at repo root with the full flow: Seed -> Select Mines -> Analyze -> animated evaluation -> auto-generated fully-revealed 5x5 grid. No frameworks, no build step, no external network deps. Also create the assets/ directory with a clearly-marked neutral placeholder logo referenced at assets/logo.png so the real high-res gorilla logo can be dropped in later without code changes.",
+  "status": "completed",
+  "steps": [
+    "Create the assets/ directory. Add a placeholder logo at assets/logo.png. Since binary images cannot be hand-authored reliably, instead create assets/logo.svg as a simple, visually-neutral bordered box containing the text 'LOGO — replace assets/logo.png with the official gorilla logo', AND reference the logo in index.html via <img src=\"assets/logo.png\" onerror=\"this.src='assets/logo.svg'\"> so that (a) the real assets/logo.png works when the user drops it in, and (b) the placeholder SVG shows until then. Use CSS max-width + object-fit: contain on the logo <img> so any real logo renders at full quality without distortion, preserving proportions. Do NOT draw a gorilla.",
+    "Create index.html at repo root. Include <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1\"> for mobile. Use a mobile-only, premium/futuristic visual style (dark theme, neon/gradient accents, polished spacing) constrained to a phone-width container (e.g. max-width ~430px centered). Use a system font stack (no external fonts) or self-hosted fallback.",
+    "Layout the branded header with the logo <img> at top and the title 'MINES STACKER BOT'. Ensure it looks intentional on a ~390px viewport.",
+    "Implement a deterministic seeded PRNG in vanilla JS (e.g. xmur3 to hash the seed string into a 32-bit int, then mulberry32 for the RNG stream). Same seed string + same mine count MUST reproduce the exact same grid.",
+    "Build the Seed stage: a text input for the seed plus a 'Generate' button that fills the input with a random seed string. The seed is used verbatim for deterministic generation.",
+    "Build the Mines selection stage: a control to pick the mines count (e.g. buttons or a stepper/select covering a sensible range like 1-24 for a 25-cell grid). The selected mine count is stored and shown as display context.",
+    "Build the Analyze action: a prominent 'Analyze' button that triggers the evaluation sequence. Disable/guard it until a seed and mines count exist.",
+    "Implement the animated evaluation sequence: a visible 'evaluating'/'analyzing' animation (e.g. progress bar, scanning shimmer, or cycling status text) that plays for a short duration before the grid renders. Pure CSS/JS animation, no libraries.",
+    "Implement grid generation and reveal. Render EXACTLY 25 cells in a 5x5 grid, fully revealed (no cell is clickable/openable/selectable — attach no click/reveal handlers to cells; this is analysis/visualisation, not a playable game). REVEAL RULE: do NOT reveal true mine positions. Using the seeded PRNG, deterministically choose 4-5 random cells to display as SAFE green gem tiles showing 💎 with a green gem style; render ALL remaining cells with a gray 'mines' gradient style (no 💣 shown at real bomb positions). Define a red mine (💣) cell style/state in CSS so the state exists per spec, but the default reveal uses ~4-5 gems + gray gradient for the rest. Show the selected mine count somewhere in the results context (e.g. 'Mines: N').",
+    "Wire the stage state machine so the flow progresses Seed -> Mines -> Analyze -> Evaluation animation -> Grid, and provide a way to run another analysis (e.g. re-analyze / reset) without reloading. Re-running with the same seed + same mine count must reproduce the same grid.",
+    "Ensure the entire app is self-contained and works offline from file:// with no external requests (inline CSS + JS in index.html is acceptable, or split into assets/style.css and assets/app.js referenced with relative paths). Verify no CDN/font/library URLs are referenced."
+  ],
+  "acceptance_criteria": [
+    "index.html exists at repo root and opens/runs directly in a browser with no build step and no network access.",
+    "assets/logo.png is referenced via <img> with object-fit:contain and max-width so a real logo would render undistorted; a clearly-marked neutral placeholder (assets/logo.svg via onerror fallback) renders until the real logo is added; no gorilla artwork was drawn.",
+    "The app is styled mobile-only (viewport meta present, phone-width container) with a premium/futuristic look.",
+    "The flow works: enter/generate a seed, select a mines count, tap Analyze, an animated evaluation plays, then a 5x5 grid of exactly 25 cells auto-generates fully revealed.",
+    "The revealed grid shows only 4-5 tiles as green gem (💎) safe tiles and all remaining tiles in a gray mines gradient; true bomb positions are never revealed.",
+    "No grid cell is clickable/openable/selectable (the user cannot play the mines game); the grid is auto-generated and fully revealed by Analyze only.",
+    "The selected mine count is shown as display context with the results.",
+    "The same seed string + same mine count reproduces the identical grid on repeated analysis.",
+    "No external network requests, fonts, JS libraries, or CDN URLs are present anywhere in the app."
+  ],
+  "verification": [
+    "Run `node --check` on the extracted JavaScript (or on assets/app.js if split) to confirm there are no syntax errors.",
+    "Grep index.html (and assets/*) to confirm there are NO external URLs (http://, https://, //cdn) referenced for scripts, styles, or fonts.",
+    "Confirm the grid container produces exactly 25 cells (5x5).",
+    "Open index.html in a browser at a ~390px mobile viewport and walk the full flow: generate/enter seed -> select mines -> Analyze -> evaluation animation -> 5x5 grid with 4-5 gems + gray tiles; confirm cells are not clickable; confirm same seed + mines reproduces the same grid."
+  ],
+  "blocked_reason": null,
+  "findings": "Implemented as split files: index.html (root) + assets/style.css + assets/app.js, all referenced with relative paths so it runs from file:// offline. PRNG: xmur3 hashes (seed + '::' + mines) then mulberry32 drives a Fisher-Yates shuffle; gemCount is 4 or 5 chosen deterministically from the stream. Verified via node simulation: exactly 25 cells, 4-5 gems, identical grid for same seed+mines, different grid when seed or mines change. `node --check assets/app.js` passes. External-URL grep is clean; the only http match is the required xmlns=\"http://www.w3.org/2000/svg\" namespace in logo.svg (not a network request). assets/logo.png intentionally does NOT exist (binary PNG cannot be hand-authored); <img> uses onerror fallback to the neutral assets/logo.svg placeholder, and CSS uses object-fit:contain + max-width so the real logo drops in undistorted. No gorilla artwork drawn. Cells have zero click/reveal handlers (visualisation only). Mines range 1-24. Re-analyze reproduces the same grid; Reset returns to seed stage. FEAT-002 (README) still pending."
+}
