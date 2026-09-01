@@ -1,80 +1,774 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="neon-purple">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="theme-color" content="#070a14">
-  <title>MINES STACKER BOT</title>
-  <link rel="stylesheet" href="assets/style.css">
+<meta charset="UTF-8">
+<!-- pinch-zoom intentionally allowed: no maximum-scale / user-scalable lock -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#06060b">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="MineStackerBot — seed-driven Mines analysis and 5x5 grid visualization. Estimated, simulated visualizations only.">
+<title>MineStackerBot — Estimated Mines Analysis</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/core.css">
+<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/views.css">
+<link rel="stylesheet" href="assets/css/animations.css">
 </head>
 <body>
-  <main class="app">
 
-    <!-- Branded header -->
-    <header class="header">
-      <div class="logo-wrap">
+<!-- ============================================================ ICON SPRITE
+     Inline SVG only — no icon font, no external requests. -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7M5.5 9.5v10h13v-10"/><path d="M9.75 19.5v-5.5h4.5v5.5"/></symbol>
+  <symbol id="i-analyze" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.2"/><path d="M12 1.8v3.2M12 19v3.2M1.8 12h3.2M19 12h3.2"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 7.3V12l3.4 2.1"/></symbol>
+  <symbol id="i-pro" viewBox="0 0 24 24"><path d="M3.2 8.4l3.6 3.1L12 4.4l5.2 7.1 3.6-3.1-1.7 10.2H4.9L3.2 8.4Z"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.3 14.2a7.6 7.6 0 0 0 .06-2.4l1.85-1.32-1.6-2.77-2.16.72a7.6 7.6 0 0 0-2.08-1.2L14.98 3H11.8l-.39 2.25a7.6 7.6 0 0 0-2.08 1.2l-2.16-.72-1.6 2.77L7.42 9.8a7.6 7.6 0 0 0 0 2.4L5.57 13.5l1.6 2.77 2.16-.72a7.6 7.6 0 0 0 2.08 1.2L11.8 21h3.18"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.7"/><path d="M4.8 20c.6-3.7 3.6-5.9 7.2-5.9s6.6 2.2 7.2 5.9"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="M7.4 3.6h9.2l4 5.1L12 20.6 3.4 8.7l4-5.1Z"/><path d="M3.6 8.8h16.8M9.4 3.7 12 20.4l2.6-16.7M9.4 3.7 7.2 8.8h9.6l-2.2-5.1"/></symbol>
+  <symbol id="i-mine" viewBox="0 0 24 24"><circle cx="11.6" cy="13.2" r="6.2"/><path d="M15.9 8.9l2.6-2.6M17.4 3.9v2.2h2.2"/><path d="M8.6 11.1a3.6 3.6 0 0 1 2-1.9"/></symbol>
+  <symbol id="i-hidden" viewBox="0 0 24 24"><path d="M6.4 12h11.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.6 15.6 20.4 20.4"/></symbol>
+  <symbol id="i-paste" viewBox="0 0 24 24"><path d="M9 4.6H7.2A1.7 1.7 0 0 0 5.5 6.3v13A1.7 1.7 0 0 0 7.2 21h9.6a1.7 1.7 0 0 0 1.7-1.7v-13A1.7 1.7 0 0 0 16.8 4.6H15"/><rect x="9" y="2.9" width="6" height="3.4" rx="1.2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.2 6.2 17.8 17.8M17.8 6.2 6.2 17.8"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.8 12.6 9.4 17.2 19.2 7.4"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9.4 5.6 16 12l-6.6 6.4"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4.4 12h15M13.4 6l6 6-6 6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.2 5.2 5.8v5.4c0 4.2 2.8 7.6 6.8 9.6 4-2 6.8-5.4 6.8-9.6V5.8L12 3.2Z"/><path d="M9.2 12.2 11.5 14.5 15.2 10"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13.4 2.8 5.6 13.4h5l-1.4 7.8 8.2-11h-5.2l1.2-7.4Z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.2 3.4 7.6 12 12l8.6-4.4L12 3.2Z"/><path d="M3.4 12.4 12 16.8l8.6-4.4M3.4 16.6 12 21l8.6-4.4"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.6 21 19.4H3L12 3.6Z"/><path d="M12 9v4.6M12 16.6v.6"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4.6 9.6h3.1L12 5.8v12.4L7.7 14.4H4.6V9.6Z"/><path d="M15.4 9.4a3.6 3.6 0 0 1 0 5.2M17.9 6.9a7.2 7.2 0 0 1 0 10.2"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M10.2 8.6 15.6 12l-5.4 3.4V8.6Z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.9" y="10.4" width="14.2" height="9.6" rx="2.2"/><path d="M8.4 10.4V8.1a3.6 3.6 0 0 1 7.2 0v2.3"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.4 19.6h4l11-11a2.2 2.2 0 0 0-3.1-3.1l-11 11v3.1Z"/><path d="M13.9 6.6l3.5 3.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M12 11v5.4M12 7.9v.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.4 2.3 3.6 5.1 3.6 8.4s-1.2 6.1-3.6 8.4c-2.4-2.3-3.6-5.1-3.6-8.4S9.6 5.9 12 3.6Z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.6 10.2a5.4 5.4 0 0 1 10.8 0c0 4 1.5 5.6 1.5 5.6H5.1s1.5-1.6 1.5-5.6Z"/><path d="M10.2 18.6a1.9 1.9 0 0 0 3.6 0"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3.4a8.6 8.6 0 0 0 0 17.2c1.5 0 2-1 2-1.9 0-2 2-1.4 3.6-1.9 2-.6 3-2.3 3-4.6C20.6 6.9 16.8 3.4 12 3.4Z"/><path d="M8.4 9.4v.4M12 8v.4M15.4 10.4v.4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.8 7.4h14.4M9.4 7.4V5.2h5.2v2.2M6.6 7.4l.9 12.2h9l.9-12.2"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M12 2.6c3.1 2.6 4.6 6 4.6 9.6L12 17.4l-4.6-5.2c0-3.6 1.5-7 4.6-9.6Z"/><circle cx="12" cy="9.6" r="1.7"/><path d="M9.2 16.4 7 21l3.4-1.6M14.8 16.4 17 21l-3.4-1.6"/></symbol>
+  <symbol id="i-social-x" viewBox="0 0 24 24"><path d="M5 4.6h3.4l10.6 14.8h-3.4L5 4.6Z"/><path d="M5.6 19.4 11 13.4M13.6 10.6 18.8 4.6"/></symbol>
+  <symbol id="i-telegram" viewBox="0 0 24 24"><path d="M20.6 4.4 3.9 11l4.3 1.6 1.6 5.2 2.6-3 4.2 3.2 4-13.6Z"/><path d="M8.2 12.6 20.6 4.4l-8.2 9.4"/></symbol>
+  <symbol id="i-discord" viewBox="0 0 24 24"><path d="M8.4 6.2A13 13 0 0 1 12 5.8c1.3 0 2.5.15 3.6.4l1.6.6c2 3 2.9 6.3 2.6 9.8a13 13 0 0 1-4 2 8 8 0 0 1-.8-1.4M8.4 6.2 6.8 6.8c-2 3-2.9 6.3-2.6 9.8a13 13 0 0 0 4 2c.3-.45.56-.92.8-1.4"/><circle cx="9.4" cy="13" r="1.2"/><circle cx="14.6" cy="13" r="1.2"/></symbol>
+</defs></svg>
+
+<!-- ============================================================ LOADING SCREEN -->
+<div class="boot" id="boot" role="status" aria-live="polite">
+  <div class="boot__inner">
+    <div class="boot__gem" aria-hidden="true">
+      <svg class="icon icon--xl"><use href="#i-gem"></use></svg>
+      <span class="boot__scan"></span>
+    </div>
+    <div class="boot__grid" aria-hidden="true"></div>
+    <p class="boot__label mono">INITIALIZING MINESTACKERBOT</p>
+  </div>
+</div>
+
+<!-- ============================================================ AMBIENT BACKDROP -->
+<div class="ambient" aria-hidden="true">
+  <span class="ambient__grid"></span>
+  <span class="ambient__glow ambient__glow--a"></span>
+  <span class="ambient__glow ambient__glow--b"></span>
+  <span class="ambient__glow ambient__glow--c"></span>
+  <span class="ambient__particles" id="ambientParticles"></span>
+</div>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ============================================================ APP SHELL -->
+<div class="shell">
+
+  <!-- ---------- SIDEBAR (laptop / desktop; icon rail on tablet) ---------- -->
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar__brand" href="#/home" data-nav-brand>
+      <span class="logo-frame logo-frame--sm">
         <img class="logo" src="assets/logo.png"
              onerror="this.onerror=null;this.src='assets/logo.svg'"
-             alt="Mines Stacker Bot logo">
-      </div>
-      <div class="brand">
-        <h1 class="title">MINES STACKER BOT</h1>
-        <span class="subtitle">Analysis &amp; Visualisation</span>
+             alt="MineStackerBot logo" width="40" height="40" decoding="async">
+      </span>
+      <span class="sidebar__brandText">
+        <strong>MINESTACKER<span class="grad-text">BOT</span></strong>
+        <em class="mono">v2.0.0</em>
+      </span>
+    </a>
+
+    <nav class="sidenav" aria-label="Primary">
+      <a class="sidenav__item" href="#/home" data-route="home"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>HOME</span></a>
+      <a class="sidenav__item" href="#/analyze" data-route="analyze"><svg class="icon" aria-hidden="true"><use href="#i-analyze"></use></svg><span>ANALYZE</span></a>
+      <a class="sidenav__item" href="#/history" data-route="history"><svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg><span>HISTORY</span></a>
+      <a class="sidenav__item" href="#/subscription" data-route="subscription"><svg class="icon" aria-hidden="true"><use href="#i-pro"></use></svg><span>SUBSCRIPTION</span></a>
+      <a class="sidenav__item" href="#/settings" data-route="settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>SETTINGS</span></a>
+      <a class="sidenav__item" href="#/profile" data-route="profile"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg><span>PROFILE</span></a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a class="sidebar__note" href="#/about">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+        <span>Estimated visualizations only — outcomes are never promised. <strong>Read more</strong></span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ---------- MAIN COLUMN ---------- -->
+  <div class="col">
+
+    <header class="topbar">
+      <a class="topbar__brand" href="#/home">
+        <span class="logo-frame logo-frame--xs">
+          <img class="logo" src="assets/logo.png"
+               onerror="this.onerror=null;this.src='assets/logo.svg'"
+               alt="MineStackerBot logo" width="32" height="32" decoding="async">
+        </span>
+        <strong>MINESTACKER<span class="grad-text">BOT</span></strong>
+      </a>
+
+      <h1 class="topbar__title" id="pageTitle">Home</h1>
+
+      <div class="topbar__right">
+        <span class="badge badge--plan" id="planBadge" title="Current plan">FREE</span>
+        <a class="iconbtn" href="#/profile" aria-label="Open profile">
+          <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        </a>
       </div>
     </header>
 
-    <!-- Stage 1: Seed -->
-    <section class="panel">
-      <span class="panel-label"><span class="step-num">1</span>Seed</span>
-      <div class="seed-row">
-        <input id="seedInput" class="seed-input" type="text"
-               placeholder="Enter a seed" autocomplete="off"
-               autocapitalize="characters" spellcheck="false">
-        <button id="generateBtn" class="btn ghost" type="button">Generate</button>
-      </div>
-    </section>
+    <main class="views" id="main" tabindex="-1">
 
-    <!-- Stage 2: Mines selection -->
-    <section class="panel">
-      <div class="mines-head">
-        <span class="panel-label" style="margin:0;"><span class="step-num">2</span>Select Mines</span>
-        <span class="mines-value" id="minesValue">&mdash;</span>
-      </div>
-      <div class="mines-grid" id="minesGrid"></div>
-    </section>
+      <!-- ============================================================
+           VIEW: HOME (landing / marketing)
+           ============================================================ -->
+      <section class="view" id="view-home" data-view="home" data-title="Home" hidden>
 
-    <!-- Stage 3: Analyze -->
-    <section>
-      <button id="analyzeBtn" class="btn-analyze" type="button" disabled>Analyze</button>
-    </section>
+        <!-- A. HERO -->
+        <section class="hero">
+          <div class="hero__copy">
+            <span class="pill" data-reveal><span class="dot dot--green"></span><span class="mono">SEED-DRIVEN ANALYSIS ENGINE</span></span>
+            <h2 class="hero__title" data-reveal>Read the grid.<br><span class="grad-text">Move with clarity.</span></h2>
+            <p class="hero__sub" data-reveal>Seed-driven Mines analysis and grid visualization — built for speed and clarity.
+              Every result is an estimated visualization, never a promise of outcome.</p>
+            <div class="hero__cta" data-reveal>
+              <button class="btn btn--primary btn--lg" type="button" data-scroll-to="demo" data-ripple>
+                Try Free Demo <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+              <button class="btn btn--outline btn--lg" type="button" data-scroll-to="how">How It Works</button>
+            </div>
+            <ul class="hero__meta mono" data-reveal>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Runs fully offline</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Deterministic per seed</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>No cell interaction</li>
+            </ul>
+          </div>
 
-    <!-- Stage 4: Evaluation animation -->
-    <section class="panel stage eval" id="stageEval" hidden>
-      <span class="panel-label"><span class="step-num">4</span>Evaluating</span>
-      <div class="eval-status" id="evalStatus">Initialising...</div>
-      <div class="eval-bar"><div class="eval-fill" id="evalFill"></div></div>
-      <div class="eval-scan"></div>
-    </section>
+          <div class="hero__visual" data-reveal>
+            <div class="hero__stage" aria-hidden="true">
+              <div class="deco-grid" id="heroGrid"></div>
+              <span class="hero__sweep"></span>
+            </div>
+            <p class="hero__caption mono">Illustrative grid animation — not a live analysis.</p>
+          </div>
+        </section>
 
-    <!-- Stage 5: Results grid -->
-    <section class="panel stage" id="stageResults" hidden>
-      <div class="results-head">
-        <span class="panel-label" style="margin:0;"><span class="step-num">5</span>Analysis</span>
-        <div class="results-meta">
-          <span class="mines-label" id="resultsMines">Mines: 0</span>
-          <span class="seed-label" id="resultsSeed">Seed:</span>
+        <!-- B. FEATURES / HOW IT WORKS -->
+        <section class="section" id="how">
+          <header class="section__head" data-reveal>
+            <span class="eyebrow mono">HOW IT WORKS</span>
+            <h3 class="section__title">Three steps. No guesswork about the process.</h3>
+            <p class="section__sub">Paste a seed, choose a mine count, run the analysis. The engine derives a
+              deterministic 5 × 5 visualization from your seed — the same inputs always render the same grid.</p>
+          </header>
+
+          <div class="cards cards--3">
+            <article class="card card--feature" data-reveal>
+              <span class="card__icon"><svg class="icon icon--lg"><use href="#i-shield"></use></svg></span>
+              <h4>Seed Analysis</h4>
+              <p>Enter any seed or seed hash and get an instant, reproducible grid visualization derived from it.</p>
+              <span class="card__foot mono">DETERMINISTIC · REPRODUCIBLE</span>
+            </article>
+            <article class="card card--feature" data-reveal>
+              <span class="card__icon"><svg class="icon icon--lg"><use href="#i-zap"></use></svg></span>
+              <h4>Real-Time Calculation</h4>
+              <p>No lag, pure math. The model runs locally in your browser — nothing is uploaded, nothing is fetched.</p>
+              <span class="card__foot mono">LOCAL · NO NETWORK</span>
+            </article>
+            <article class="card card--feature" data-reveal>
+              <span class="card__icon"><svg class="icon icon--lg"><use href="#i-layers"></use></svg></span>
+              <h4>Multi-Game Support</h4>
+              <p>Works with seeds from all major platforms — paste the seed format you already use, mine counts 1–24.</p>
+              <span class="card__foot mono">1–24 MINES · 5 × 5</span>
+            </article>
+          </div>
+        </section>
+
+        <!-- C. INTERACTIVE DEMO (the real bot, mounted inline) -->
+        <section class="section" id="demo">
+          <header class="section__head" data-reveal>
+            <span class="eyebrow mono">INTERACTIVE DEMO</span>
+            <h3 class="section__title">The real engine, running right here.</h3>
+            <p class="section__sub">This is not a screenshot. Enter a seed, pick a mine count and press analyze —
+              the same code path the dashboard uses, with results saved to your local history.</p>
+          </header>
+
+          <div class="demo" data-reveal>
+            <div class="demo__panel glass">
+              <!-- Analysis console instance #2 (compact). Rendered by analysis.js -->
+              <div class="console console--compact" data-console="demo"></div>
+            </div>
+            <aside class="demo__side">
+              <div class="card card--tight">
+                <h4 class="mono">WANT THE FULL DASHBOARD?</h4>
+                <p>The dashboard adds the status panel, wider grid focus and full analysis history.</p>
+                <a class="btn btn--primary btn--full" href="#/analyze" data-ripple>Open Analyze Dashboard</a>
+              </div>
+              <button class="btn btn--ghost btn--full" type="button" data-modal="modal-demo">
+                <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg> Watch Demo
+              </button>
+            </aside>
+          </div>
+        </section>
+
+        <!-- D. PRICING -->
+        <section class="section" id="pricing">
+          <header class="section__head" data-reveal>
+            <span class="eyebrow mono">PRICING</span>
+            <h3 class="section__title">Straightforward tiers.</h3>
+            <p class="section__sub">Pick the allowance that matches how often you analyze. Checkout is not connected in
+              this build — the interface is ready for a real payment provider.</p>
+          </header>
+          <div class="cards cards--3 plans" data-reveal>
+            <article class="plan">
+              <h4 class="plan__name mono">FREE</h4>
+              <p class="plan__price"><span>$0</span><em>/month</em></p>
+              <ul class="plan__list">
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Basic analysis</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Limited history (last 10)</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Standard visualization</li>
+              </ul>
+              <a class="btn btn--outline btn--full" href="#/analyze">Current plan</a>
+            </article>
+
+            <article class="plan plan--featured">
+              <span class="plan__flag mono">MOST POPULAR</span>
+              <h4 class="plan__name mono">PRO</h4>
+              <p class="plan__price"><span>$19</span><em>/month</em></p>
+              <ul class="plan__list">
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Higher usage allowance</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Full analysis history</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Premium visualization</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Advanced interface features</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Premium animations</li>
+              </ul>
+              <button class="btn btn--primary btn--full" type="button" data-checkout="pro-monthly" data-ripple>Upgrade to Pro</button>
+            </article>
+
+            <article class="plan">
+              <h4 class="plan__name mono">VIP</h4>
+              <p class="plan__price"><span>$49</span><em>/month</em></p>
+              <ul class="plan__list">
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Everything in Pro</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Priority analysis speed</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Unlimited history export</li>
+                <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Direct support channel</li>
+              </ul>
+              <button class="btn btn--outline btn--full" type="button" data-checkout="vip-monthly">Choose VIP</button>
+            </article>
+          </div>
+          <p class="note note--edit" data-reveal>
+            <svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg>
+            <span><strong>Owner placeholder:</strong> prices, plan limits and any refund terms are editable
+            placeholder copy. Publish only terms you can actually honour.</span>
+          </p>
+        </section>
+
+        <!-- E. SOCIAL PROOF — placeholder scaffolding only -->
+        <section class="section" id="proof">
+          <header class="section__head" data-reveal>
+            <span class="eyebrow mono">SOCIAL PROOF</span>
+            <h3 class="section__title">Reserved for real, consented feedback.</h3>
+            <p class="section__sub">These slots are intentionally empty. Fill them with quotes from real users who have
+              agreed to be quoted — do not publish invented testimonials or win screenshots.</p>
+          </header>
+          <div class="cards cards--3" data-reveal>
+            <article class="slot"><span class="slot__tag mono">SLOT 01</span><p>Testimonial slot — replace with a real, verified user quote.</p><span class="slot__by mono">— Name, role (with permission)</span></article>
+            <article class="slot"><span class="slot__tag mono">SLOT 02</span><p>Testimonial slot — replace with a real, verified user quote.</p><span class="slot__by mono">— Name, role (with permission)</span></article>
+            <article class="slot"><span class="slot__tag mono">SLOT 03</span><p>Testimonial slot — replace with a real, verified user quote.</p><span class="slot__by mono">— Name, role (with permission)</span></article>
+          </div>
+        </section>
+
+        <!-- F. FOOTER -->
+        <footer class="footer" data-reveal>
+          <div class="footer__top">
+            <div class="footer__brand">
+              <span class="logo-frame logo-frame--sm">
+                <img class="logo" src="assets/logo.png"
+                     onerror="this.onerror=null;this.src='assets/logo.svg'"
+                     alt="MineStackerBot logo" width="40" height="40" decoding="async">
+              </span>
+              <div>
+                <strong>MINESTACKER<span class="grad-text">BOT</span></strong>
+                <p>Estimated Mines analysis and grid visualization. Results are simulations and do not predict
+                  or promise future game outcomes.</p>
+              </div>
+            </div>
+            <nav class="footer__links" aria-label="Footer">
+              <div>
+                <h5 class="mono">PRODUCT</h5>
+                <a href="#/analyze">Analyze</a><a href="#/history">History</a><a href="#/subscription">Subscription</a>
+              </div>
+              <div>
+                <h5 class="mono">LEGAL</h5>
+                <button type="button" data-modal="modal-terms">Terms &amp; Conditions</button>
+                <button type="button" data-modal="modal-privacy">Privacy Policy</button>
+                <a href="#/about">Responsible Use</a>
+              </div>
+              <div>
+                <h5 class="mono">SOCIALS</h5>
+                <div class="footer__socials">
+                  <button class="iconbtn" type="button" data-social="X" aria-label="X (link not configured)"><svg class="icon" aria-hidden="true"><use href="#i-social-x"></use></svg></button>
+                  <button class="iconbtn" type="button" data-social="Telegram" aria-label="Telegram (link not configured)"><svg class="icon" aria-hidden="true"><use href="#i-telegram"></use></svg></button>
+                  <button class="iconbtn" type="button" data-social="Discord" aria-label="Discord (link not configured)"><svg class="icon" aria-hidden="true"><use href="#i-discord"></use></svg></button>
+                </div>
+              </div>
+            </nav>
+          </div>
+          <p class="footer__legal mono">© <span id="footYear">2025</span> MINESTACKERBOT · 18+ · ANALYSIS TOOL, NOT A GAME · NO OUTCOME IS PROMISED</p>
+        </footer>
+      </section>
+
+      <!-- ============================================================
+           VIEW: ANALYZE (home / analysis dashboard)
+           ============================================================ -->
+      <section class="view" id="view-analyze" data-view="analyze" data-title="Analyze" hidden>
+        <div class="dash">
+
+          <div class="dash__main">
+            <header class="analysis-head">
+              <h2 class="analysis-head__brand">MINESTACKERBOT</h2>
+              <p class="analysis-head__lead">Estimated Mines Analysis</p>
+              <p class="analysis-head__sub">Generate an estimated 5 × 5 grid visualization.</p>
+              <span class="status-chip" id="statusChip"><span class="dot dot--green"></span><span class="mono">READY</span></span>
+            </header>
+
+            <!-- Analysis console instance #1 (full). Rendered by analysis.js -->
+            <div class="console" data-console="app"></div>
+          </div>
+
+          <!-- Right info panel (desktop / wide only) -->
+          <aside class="dash__side" aria-label="Analysis status">
+            <div class="card card--tight">
+              <h4 class="mono">SESSION STATUS</h4>
+              <dl class="kv">
+                <div><dt>Engine</dt><dd><span class="dot dot--green"></span> Local</dd></div>
+                <div><dt>Network</dt><dd>Offline · none used</dd></div>
+                <div><dt>Analyses run</dt><dd id="sideCount">0</dd></div>
+                <div><dt>Last seed</dt><dd class="mono" id="sideSeed">—</dd></div>
+              </dl>
+            </div>
+
+            <div class="card card--tight">
+              <h4 class="mono">CELL LEGEND</h4>
+              <ul class="legend">
+                <li><span class="legend__sw cell cell--gem" aria-hidden="true"><svg class="icon"><use href="#i-gem"></use></svg></span>
+                  <span><strong>Gem</strong> — revealed safe tile</span></li>
+                <li><span class="legend__sw cell cell--hidden" aria-hidden="true"><svg class="icon"><use href="#i-hidden"></use></svg></span>
+                  <span><strong>Unrevealed</strong> — no information shown</span></li>
+                <li><span class="legend__sw cell cell--mine" aria-hidden="true"><svg class="icon"><use href="#i-mine"></use></svg></span>
+                  <span><strong>Mine</strong> — defined in the design system, but never computed or revealed by this tool</span></li>
+              </ul>
+            </div>
+
+            <div class="card card--tight card--muted">
+              <h4 class="mono">RESPONSIBLE USE</h4>
+              <p>Confidence figures are <strong>simulated illustrative metrics</strong>, not measured accuracy.
+                Visualizations are estimates and do not predict future game outcomes.</p>
+              <a class="link" href="#/about">Read the full statement <svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+            </div>
+          </aside>
         </div>
-      </div>
-      <div class="grid" id="grid"></div>
-      <div class="results-actions">
-        <button id="reanalyzeBtn" class="btn" type="button">Re-analyze</button>
-        <button id="resetBtn" class="btn ghost" type="button">Reset</button>
-      </div>
-      <p class="hint">Safe tiles shown as gems. Bomb positions are never revealed.</p>
-    </section>
+      </section>
 
-  </main>
+      <!-- ============================================================
+           VIEW: HISTORY
+           ============================================================ -->
+      <section class="view" id="view-history" data-view="history" data-title="History" hidden>
+        <header class="page-head">
+          <h2 class="page-title">PAST ANALYSES</h2>
+          <p class="page-sub">Every analysis you run on this device is stored locally in your browser.</p>
+        </header>
 
-  <script src="assets/app.js"></script>
+        <div class="toolbar">
+          <div class="field field--icon">
+            <svg class="icon field__lead" aria-hidden="true"><use href="#i-search"></use></svg>
+            <label class="sr-only" for="historySearch">Search analyses</label>
+            <input id="historySearch" class="input" type="search" placeholder="Search by date or mine count..." autocomplete="off">
+          </div>
+          <button class="btn btn--ghost" type="button" id="historyClear">
+            <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg> Clear
+          </button>
+        </div>
+
+        <div class="history" id="historyList" role="list"></div>
+        <p class="history__count mono" id="historyCount" aria-live="polite"></p>
+      </section>
+
+      <!-- ============================================================
+           VIEW: HISTORY DETAIL (read-only)
+           ============================================================ -->
+      <section class="view" id="view-detail" data-view="detail" data-title="Analysis Details" hidden>
+        <header class="page-head">
+          <a class="link link--back" href="#/history"><svg class="icon" aria-hidden="true"><use href="#i-chevron"></use></svg> Back to history</a>
+          <h2 class="page-title">ANALYSIS DETAILS</h2>
+          <p class="page-sub">Read-only record. Individual cells are never interactive.</p>
+        </header>
+        <div id="detailBody" class="detail"></div>
+      </section>
+
+      <!-- ============================================================
+           VIEW: SUBSCRIPTION
+           ============================================================ -->
+      <section class="view" id="view-subscription" data-view="subscription" data-title="Subscription" hidden>
+        <header class="page-head page-head--center">
+          <h2 class="page-title">MINESTACKERBOT <span class="grad-text">PRO</span></h2>
+          <p class="page-sub">Unlock the premium analysis experience.</p>
+        </header>
+
+        <div class="cycle" role="group" aria-label="Billing cycle">
+          <button class="cycle__btn is-active" type="button" data-cycle="monthly" aria-pressed="true">MONTHLY</button>
+          <button class="cycle__btn" type="button" data-cycle="yearly" aria-pressed="false">YEARLY <span class="tag mono">BEST VALUE</span></button>
+        </div>
+
+        <div class="cards cards--3 plans plans--sub">
+          <article class="plan">
+            <h4 class="plan__name mono">FREE</h4>
+            <p class="plan__price"><span data-price-free>$0</span><em data-cycle-label>/month</em></p>
+            <ul class="plan__list">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Basic analysis</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Limited history</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Standard visualization</li>
+            </ul>
+            <button class="btn btn--outline btn--full" type="button" disabled aria-disabled="true">Your current plan</button>
+          </article>
+
+          <article class="plan plan--featured plan--dominant">
+            <span class="plan__flag mono">MOST POPULAR</span>
+            <h4 class="plan__name mono">PRO</h4>
+            <p class="plan__price"><span data-price-pro>$19</span><em data-cycle-label>/month</em></p>
+            <p class="plan__save mono" data-price-note>Billed monthly. Cancel anytime.</p>
+            <ul class="plan__list">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Higher usage allowance</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Full analysis history</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Premium visualization</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Advanced interface features</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Premium animations</li>
+            </ul>
+            <button class="btn btn--primary btn--full btn--lg" type="button" data-checkout="pro" data-ripple>UPGRADE TO PRO</button>
+          </article>
+
+          <article class="plan">
+            <h4 class="plan__name mono">VIP</h4>
+            <p class="plan__price"><span data-price-vip>$49</span><em data-cycle-label>/month</em></p>
+            <ul class="plan__list">
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Everything in Pro</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Priority analysis speed</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Unlimited history export</li>
+              <li><svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>Direct support channel</li>
+            </ul>
+            <button class="btn btn--outline btn--full" type="button" data-checkout="vip">Choose VIP</button>
+          </article>
+        </div>
+
+        <p class="note" id="checkoutNote">
+          <svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+          <span><strong>Checkout is not connected in this build.</strong> No payment can be taken and no plan can be
+          activated here. A developer wires these buttons to a real payment provider — the interface will only report an
+          active plan once a provider confirms it.</span>
+        </p>
+      </section>
+
+      <!-- ============================================================
+           VIEW: SETTINGS
+           ============================================================ -->
+      <section class="view" id="view-settings" data-view="settings" data-title="Settings" hidden>
+        <header class="page-head">
+          <h2 class="page-title">SETTINGS</h2>
+          <p class="page-sub">Preferences are stored locally on this device.</p>
+        </header>
+
+        <div class="settings">
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg> ACCOUNT</h3>
+            <a class="row row--link" href="#/profile"><span class="row__label">Profile</span><span class="row__value mono" id="rowProfileName">—</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+            <button class="row row--link" type="button" data-modal="modal-security"><span class="row__label">Security</span><span class="row__value mono">Not configured</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+            <a class="row row--link" href="#/subscription"><span class="row__label">Subscription</span><span class="row__value mono" id="rowPlan">FREE</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-analyze"></use></svg> BOT CONFIGURATION</h3>
+            <div class="row">
+              <span class="row__label"><label for="setSpeed">Analysis Speed</label><em>Length of the analysis sequence</em></span>
+              <select class="select" id="setSpeed" data-setting="speed">
+                <option value="fast">Fast · ~1.2s</option>
+                <option value="normal">Normal · ~2.2s</option>
+                <option value="cinematic">Cinematic · ~3.0s</option>
+              </select>
+            </div>
+            <div class="row">
+              <span class="row__label"><label for="setAnimations">Animations</label><em>Transitions, glow and reveal choreography</em></span>
+              <button class="toggle" type="button" role="switch" id="setAnimations" data-setting="animations" aria-checked="true"><span class="toggle__knob"></span></button>
+            </div>
+            <div class="row">
+              <span class="row__label"><label for="setSound">Sound Effects</label><em>Synthesized clicks — off by default</em></span>
+              <button class="toggle" type="button" role="switch" id="setSound" data-setting="sound" aria-checked="false"><span class="toggle__knob"></span></button>
+            </div>
+            <div class="row">
+              <span class="row__label"><label for="setHaptics">Haptics</label><em>Vibration feedback where supported</em></span>
+              <button class="toggle" type="button" role="switch" id="setHaptics" data-setting="haptics" aria-checked="false"><span class="toggle__knob"></span></button>
+            </div>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-palette"></use></svg> APP</h3>
+            <div class="row">
+              <span class="row__label"><label for="setTheme">Theme</label><em>Accent and surface treatment</em></span>
+              <select class="select" id="setTheme" data-setting="theme">
+                <option value="neon-purple">Neon Purple</option>
+                <option value="cyan-focus">Cyan Focus</option>
+                <option value="high-contrast">High Contrast</option>
+              </select>
+            </div>
+            <div class="row">
+              <span class="row__label"><label for="setLanguage">Language</label><em>Preference is saved; full localization is pending</em></span>
+              <select class="select" id="setLanguage" data-setting="language">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="pt">Português</option>
+                <option value="hi">हिन्दी</option>
+              </select>
+            </div>
+            <div class="row">
+              <span class="row__label"><label for="setNotifications">Notifications</label><em>In-app status messages</em></span>
+              <button class="toggle" type="button" role="switch" id="setNotifications" data-setting="notifications" aria-checked="true"><span class="toggle__knob"></span></button>
+            </div>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg> ABOUT</h3>
+            <a class="row row--link" href="#/about"><span class="row__label">About MineStackerBot</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+            <a class="row row--link" href="#/about"><span class="row__label">Responsible Use</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+            <div class="row"><span class="row__label">Version</span><span class="row__value mono">2.0.0 · offline build</span></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VIEW: PROFILE
+           ============================================================ -->
+      <section class="view" id="view-profile" data-view="profile" data-title="Profile" hidden>
+        <header class="page-head">
+          <h2 class="page-title">PROFILE</h2>
+          <p class="page-sub">Local account details. Nothing is transmitted anywhere.</p>
+        </header>
+
+        <div class="profile">
+          <section class="card profile__id">
+            <span class="logo-frame logo-frame--lg">
+              <img class="logo" src="assets/logo.png"
+                   onerror="this.onerror=null;this.src='assets/logo.svg'"
+                   alt="MineStackerBot logo" width="88" height="88" decoding="async">
+            </span>
+            <h3 id="profileName">Operator</h3>
+            <p class="mono" id="profileSince">Member since —</p>
+            <span class="badge badge--plan" id="profilePlan">FREE</span>
+            <dl class="kv kv--row">
+              <div><dt>Analyses</dt><dd id="profileCount">0</dd></div>
+              <div><dt>Last analysis</dt><dd id="profileLast">—</dd></div>
+            </dl>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-edit"></use></svg> PROFILE EDIT</h3>
+            <form class="form" id="profileForm">
+              <div class="field">
+                <label for="profileInput">Username</label>
+                <input class="input" id="profileInput" type="text" maxlength="24" autocomplete="off" placeholder="Operator">
+              </div>
+              <button class="btn btn--primary" type="submit" data-ripple>Save changes</button>
+            </form>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg> SECURITY</h3>
+            <button class="row row--link" type="button" data-modal="modal-security"><span class="row__label">Password &amp; sign-in</span><span class="row__value mono">Not configured</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+            <button class="row row--link" type="button" data-modal="modal-security"><span class="row__label">Two-factor authentication</span><span class="row__value mono">Not configured</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></button>
+          </section>
+
+          <section class="card card--group">
+            <h3 class="group__title mono"><svg class="icon" aria-hidden="true"><use href="#i-pro"></use></svg> SUBSCRIPTION</h3>
+            <a class="row row--link" href="#/subscription"><span class="row__label">Manage plan</span><span class="row__value mono" id="profilePlanRow">FREE</span><svg class="icon row__chev" aria-hidden="true"><use href="#i-chevron"></use></svg></a>
+          </section>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           VIEW: ABOUT / RESPONSIBLE USE
+           ============================================================ -->
+      <section class="view" id="view-about" data-view="about" data-title="About" hidden>
+        <header class="page-head">
+          <h2 class="page-title">ABOUT &amp; <span class="grad-text">RESPONSIBLE USE</span></h2>
+          <p class="page-sub">What this tool is, what it is not, and how to read its output.</p>
+        </header>
+
+        <div class="prose">
+          <section class="card">
+            <h3>What MineStackerBot is</h3>
+            <p>MineStackerBot is an <strong>estimated Mines analysis and visualization interface</strong>. You provide a
+              client seed and a mine count; the app derives a deterministic 5 × 5 grid visualization from those inputs and
+              highlights a small number of estimated safe tiles.</p>
+            <p>It is not a playable Mines game. There is no cell interaction: all 25 cells are generated and displayed
+              automatically, and the tool never opens, selects or reveals cells on your behalf.</p>
+          </section>
+
+          <section class="card card--flag" id="responsible">
+            <h3><svg class="icon" aria-hidden="true"><use href="#i-warn"></use></svg> Responsible use — please read</h3>
+            <ul>
+              <li>Generated visualizations are <strong>estimates and simulations</strong>. They do <strong>not</strong>
+                predict, promise or influence future game outcomes.</li>
+              <li>The “estimated confidence” figure shown after an analysis is a <strong>simulated, illustrative
+                metric</strong> derived from your seed. It is <strong>not</strong> a measured accuracy, hit rate or win
+                probability, and it should not be used as a reason to place any bet.</li>
+              <li>This tool cannot determine the real mine layout of a provably-fair game. <strong>True mine positions are
+                never calculated and never displayed</strong> anywhere in the app.</li>
+              <li>Gambling carries real financial risk. Only ever risk money you can afford to lose, set your own limits,
+                and stop if it stops being entertainment.</li>
+              <li>18+ only, and only where participation is legal for you.</li>
+              <li>If gambling is causing you harm, seek support from a local problem-gambling service.</li>
+            </ul>
+          </section>
+
+          <section class="card">
+            <h3>How the visualization is produced</h3>
+            <p>Your seed string and the selected mine count are hashed (xmur3) into a deterministic random stream
+              (mulberry32). That stream selects how many safe tiles are revealed — using a fixed table keyed on your mine
+              count — and shuffles the 25 cell positions to decide which cells they land on.</p>
+            <p>The same seed with the same mine count always renders the same grid; changing either input changes the
+              grid. All remaining cells are simply left unrevealed and carry no information whatsoever.</p>
+          </section>
+
+          <section class="card">
+            <h3>Privacy &amp; offline operation</h3>
+            <p>Everything runs locally in your browser. There are no network requests, no analytics, no external fonts or
+              scripts, and no seed ever leaves your device. Your settings, profile and analysis history are stored in your
+              browser's <span class="mono">localStorage</span> and can be cleared at any time from the History page or by
+              clearing site data.</p>
+          </section>
+
+          <section class="card card--muted">
+            <h3>Version</h3>
+            <p class="mono">MINESTACKERBOT 2.0.0 · static offline build · no dependencies</p>
+          </section>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================ BOTTOM NAV (small screens) -->
+<nav class="bottomnav" aria-label="Primary mobile">
+  <a class="bottomnav__item" href="#/home" data-route="home"><svg class="icon" aria-hidden="true"><use href="#i-home"></use></svg><span>Home</span></a>
+  <a class="bottomnav__item" href="#/analyze" data-route="analyze"><svg class="icon" aria-hidden="true"><use href="#i-analyze"></use></svg><span>Analyze</span></a>
+  <a class="bottomnav__item" href="#/history" data-route="history"><svg class="icon" aria-hidden="true"><use href="#i-history"></use></svg><span>History</span></a>
+  <a class="bottomnav__item" href="#/subscription" data-route="subscription"><svg class="icon" aria-hidden="true"><use href="#i-pro"></use></svg><span>Pro</span></a>
+  <a class="bottomnav__item" href="#/settings" data-route="settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg><span>Settings</span></a>
+</nav>
+
+<!-- ============================================================ ANALYSIS OVERLAY -->
+<div class="overlay" id="analysisOverlay" hidden role="dialog" aria-modal="true" aria-labelledby="overlayPhase">
+  <div class="overlay__scene">
+    <div class="rings" aria-hidden="true">
+      <span class="ring ring--1"></span><span class="ring ring--2"></span><span class="ring ring--3"></span>
+      <span class="ring__core"><svg class="icon icon--lg"><use href="#i-gem"></use></svg></span>
+    </div>
+
+    <div class="rocket" id="rocket" aria-hidden="true">
+      <svg class="icon icon--lg rocket__body"><use href="#i-rocket"></use></svg>
+      <span class="rocket__flame"></span>
+      <span class="rocket__trail"></span>
+    </div>
+
+    <span class="overlay__scan" aria-hidden="true"></span>
+    <span class="overlay__particles" id="overlayParticles" aria-hidden="true"></span>
+
+    <p class="overlay__phase mono" id="overlayPhase">INITIALIZING ANALYSIS</p>
+    <div class="progress"><span class="progress__fill" id="overlayProgress"></span></div>
+    <p class="overlay__hint mono">Estimated visualization · simulated metrics</p>
+  </div>
+</div>
+
+<!-- ============================================================ MODALS -->
+<div class="modal" id="modal-demo" hidden role="dialog" aria-modal="true" aria-labelledby="modal-demo-t">
+  <div class="modal__panel glass">
+    <button class="modal__close iconbtn" type="button" data-modal-close aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    <h3 id="modal-demo-t">Watch the flow</h3>
+    <p>No video file ships with this offline build — here is the exact sequence the demo runs:</p>
+    <ol class="steps">
+      <li><strong>Paste a seed.</strong> Any client seed or seed hash. The field accepts the format you already use.</li>
+      <li><strong>Select mines (1–24).</strong> Counts of 10 and above are flagged ⚠ HIGH RISK.</li>
+      <li><strong>Press ANALYZE GRID.</strong> The analysis sequence runs for one to three seconds.</li>
+      <li><strong>Read the grid.</strong> Estimated safe tiles appear as gems; every other cell stays unrevealed.</li>
+    </ol>
+    <p class="note note--inline"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span>Owner placeholder: drop a real screen recording in here when you have one.</span></p>
+    <button class="btn btn--primary btn--full" type="button" data-modal-close data-ripple>Got it</button>
+  </div>
+</div>
+
+<div class="modal" id="modal-terms" hidden role="dialog" aria-modal="true" aria-labelledby="modal-terms-t">
+  <div class="modal__panel glass">
+    <button class="modal__close iconbtn" type="button" data-modal-close aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    <h3 id="modal-terms-t">Terms &amp; Conditions</h3>
+    <p class="note note--edit"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span><strong>Placeholder copy.</strong> Replace with terms reviewed by your own legal counsel before publishing.</span></p>
+    <ul class="steps">
+      <li>MineStackerBot provides estimated visualizations for informational purposes only.</li>
+      <li>No outcome, win rate or result is promised or predicted.</li>
+      <li>You are responsible for complying with the rules of any platform you use and with your local law.</li>
+      <li>Service is offered to adults (18+) only.</li>
+    </ul>
+    <button class="btn btn--outline btn--full" type="button" data-modal-close>Close</button>
+  </div>
+</div>
+
+<div class="modal" id="modal-privacy" hidden role="dialog" aria-modal="true" aria-labelledby="modal-privacy-t">
+  <div class="modal__panel glass">
+    <button class="modal__close iconbtn" type="button" data-modal-close aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    <h3 id="modal-privacy-t">Privacy Policy</h3>
+    <p class="note note--edit"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span><strong>Placeholder copy.</strong> Replace before publishing, and keep it accurate for your final hosting setup.</span></p>
+    <ul class="steps">
+      <li>This build makes <strong>no network requests</strong> and contains no analytics or trackers.</li>
+      <li>Seeds, settings, profile name and history stay in your browser's local storage on your device.</li>
+      <li>Clearing site data — or the Clear button on the History page — removes that data permanently.</li>
+    </ul>
+    <button class="btn btn--outline btn--full" type="button" data-modal-close>Close</button>
+  </div>
+</div>
+
+<div class="modal" id="modal-security" hidden role="dialog" aria-modal="true" aria-labelledby="modal-security-t">
+  <div class="modal__panel glass">
+    <button class="modal__close iconbtn" type="button" data-modal-close aria-label="Close dialog"><svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg></button>
+    <h3 id="modal-security-t">Security</h3>
+    <p>This build has no accounts or sign-in: the app is fully local, so there are no credentials to protect yet.</p>
+    <p class="note note--inline"><svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg><span>Developer note: wire these rows to your authentication provider when you add accounts.</span></p>
+    <button class="btn btn--outline btn--full" type="button" data-modal-close>Close</button>
+  </div>
+</div>
+
+<!-- ============================================================ CHROME EXTRAS -->
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__ring"></span></div>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="assets/js/model.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/analysis.js"></script>
+<script src="assets/js/app.js"></script>
 </body>
 </html>
