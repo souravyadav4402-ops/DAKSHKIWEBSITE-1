@@ -211,7 +211,12 @@
 .analyze { letter-spacing: .16em; }
 @media (min-width: 700px) { .analyze { align-self: center; width: min(420px, 100%); } }
 
-.results { display: flex; flex-direction: column; gap: 18px; }
+.results {
+  display: flex; flex-direction: column; gap: 18px;
+  /* keep the completion banner clear of the sticky glass topbar when
+     scrollIntoView() brings the results into view */
+  scroll-margin-top: calc(var(--topbar-h) + 18px);
+}
 .results__head { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .results__ok {
   display: inline-flex; align-items: center; gap: 8px;
