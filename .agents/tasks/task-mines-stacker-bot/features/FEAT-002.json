@@ -1,0 +1,24 @@
+{
+  "id": "FEAT-002",
+  "type": "docs",
+  "description": "Add a README.md documenting what the app is, how to run it (open index.html), and the mandatory logo-replacement step: replace the placeholder at assets/logo.png with the official high-resolution Mines Stacker Bot gorilla logo, preserving original proportions/quality (the CSS uses object-fit/max-width so the real logo displays undistorted). Depends on FEAT-001.",
+  "status": "completed",
+  "steps": [
+    "Create README.md at repo root.",
+    "Document the project: 'MINES STACKER BOT' — a premium mobile-only Mines analysis/visualisation app (NOT a playable game). Briefly describe the flow: Seed -> Select Mines -> Analyze -> animated evaluation -> auto-generated fully-revealed 5x5 grid.",
+    "Document how to run: it is a self-contained static HTML app with no build step and no dependencies. Open index.html directly in a browser (works offline via file://). Best viewed at a mobile/phone viewport.",
+    "Document the logo replacement step clearly: the app references assets/logo.png. Replace the placeholder with the official high-resolution gorilla logo at that exact path (do not rename). Do not recreate, redraw, simplify, or modify the logo. The CSS uses object-fit:contain and max-width so the real logo renders at full quality with original proportions.",
+    "Note the reveal behavior for transparency: the grid reveals ~4-5 random safe green gem tiles and renders the rest as a gray mines gradient; it never exposes true bomb positions."
+  ],
+  "acceptance_criteria": [
+    "README.md exists at repo root.",
+    "README explains what the app is, that it is analysis/visualisation and not playable, and the full flow.",
+    "README explains how to run it (open index.html, no build step, offline-capable).",
+    "README clearly documents replacing assets/logo.png with the official gorilla logo without renaming or modifying it, noting proportions/quality are preserved by CSS."
+  ],
+  "verification": [
+    "Confirm README.md exists at repo root and mentions index.html, the run instructions, and the assets/logo.png replacement step."
+  ],
+  "blocked_reason": null,
+  "findings": "Created README.md at repo root documenting the app (analysis/visualisation, not playable), the Seed->Select Mines->Analyze->animated evaluation->auto-generated 5x5 grid flow, deterministic seeding, how to run (open index.html, no build step, offline via file://, mobile viewport best), the mandatory assets/logo.png replacement step (same path/filename, do not rename/recreate/modify, CSS object-fit:contain + max-width preserves proportions/quality, logo.svg fallback via onerror), and the reveal behavior (4-5 safe gem tiles + gray mines gradient, bomb positions never revealed). Docs-only change; no build/test applicable per context.json (no build system/test framework). Avoided em dashes per style rule. Verified actual repo layout matches (index.html + assets/app.js, style.css, logo.svg; logo.png not yet present as expected)."
+}

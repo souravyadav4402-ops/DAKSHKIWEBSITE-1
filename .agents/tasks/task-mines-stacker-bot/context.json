@@ -1,0 +1,16 @@
+{
+  "project_type": "Self-contained mobile-only static HTML/CSS/JS web application (no framework, no build step)",
+  "language": "HTML, CSS, JavaScript (vanilla)",
+  "build_system": "None. No npm, no bundler, no build step. The app runs by opening index.html directly in a browser.",
+  "test_framework": "None. Verification is manual/visual plus static checks (HTML validity, JS syntax check via node --check on extracted script if split, or by opening in a browser).",
+  "build_command": "None (no build step). Optional syntax sanity: open index.html in a browser.",
+  "test_command": "None automated. Manual verification: open index.html in a mobile-width browser viewport and walk the Seed -> Mines -> Analyze -> Evaluation -> 5x5 grid flow.",
+  "verification_instructions": "1. Open index.html directly (file://) in a browser at a mobile viewport (~390px wide). 2. Confirm logo renders from assets/logo.png (placeholder acceptable). 3. Enter or generate a seed. 4. Select a mines count. 5. Tap Analyze. 6. Confirm an animated evaluation sequence plays. 7. Confirm a 5x5 grid of exactly 25 cells auto-generates and is fully revealed showing only 4-5 green gem tiles and the rest as gray mines-gradient tiles (no bomb positions revealed). 8. Confirm the same seed + same mine count reproduces the same grid. 9. Confirm the user cannot click/open/select individual cells to play.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "No setup required. Clone and open index.html. To use the real logo, replace assets/logo.png with the official high-resolution Mines Stacker Bot gorilla logo (keep the same filename/path).",
+  "environment_constraints": "No external network / no CDN. Everything must work offline as a local HTML file. No external fonts or JS libraries; use system font stack or self-hosted fonts with graceful fallback. Mobile-only design (phone viewport).",
+  "contribution_requirements": "Single self-contained index.html at repo root (inline CSS + JS acceptable, or split into assets/). No frameworks, no build step, no npm deps. Must open and run directly in a mobile browser.",
+  "key_patterns": "Screen/stage state machine in vanilla JS: (1) Seed entry/generate, (2) Mines selection, (3) Analyze button, (4) animated evaluation sequence, (5) auto-generated fully-revealed 5x5 grid (25 cells). Deterministic seeded PRNG (e.g. mulberry32/xmur3) so same seed + same mine count yields the same grid. IMPORTANT reveal rule: never reveal true mine positions; show only 4-5 random SAFE green gem (emoji) tiles and render all remaining tiles in a gray mines gradient. This is an analysis/visualisation tool, NOT a playable game: no cell is clickable/openable/selectable.",
+  "relevant_files": ["index.html", "assets/logo.png", "assets/style.css (optional if split)", "assets/app.js (optional if split)", "README.md"],
+  "directory_structure": "Repo root contains index.html, README.md, and an assets/ directory holding logo.png (placeholder to be replaced) and optionally split style.css / app.js. .agents/tasks/ holds task state."
+}

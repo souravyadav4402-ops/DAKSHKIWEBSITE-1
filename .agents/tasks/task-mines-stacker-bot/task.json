@@ -1,0 +1,14 @@
+{
+  "task_id": "task-mines-stacker-bot",
+  "task_description": "Build MINES STACKER BOT: a premium, futuristic, mobile-only, self-contained HTML/CSS/JS analysis/visualisation app (NOT a playable game). Flow: Seed -> Select Mines -> Analyze -> animated evaluation -> auto-generated fully-revealed 5x5 grid (25 cells) showing 4-5 random safe green gem tiles and the rest as gray mines gradient (never revealing true bomb positions). Uses the official gorilla logo via assets/logo.png (placeholder provided; must be replaced without modification). Deterministic seeded generation. No frameworks, no build step, no external network deps.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null,
+  "verification": {
+    "build": "pass",
+    "tests": "pass",
+    "test_quality": "pass",
+    "docker_build": "skipped",
+    "summary": "No build system or automated test framework (static HTML app), so applicable checks were run instead. `node --check assets/app.js` passes (no syntax errors). External-URL scan of index.html/style.css/app.js is clean; the only http match is the required xmlns=\"http://www.w3.org/2000/svg\" namespace in the placeholder logo.svg (not a network request). CSS confirms grid-template-columns: repeat(5,...) and a Node replication of the exact PRNG+grid model confirms exactly 25 cells, 4-5 gems, determinism for same seed+mines, different grids for different seed or mines, and only gem/gray states (true bomb positions never revealed). Cells have zero click/reveal handlers, so the app is not playable per spec. Docker build skipped (no Dockerfile; static HTML app runs from file://)."
+  }
+}
